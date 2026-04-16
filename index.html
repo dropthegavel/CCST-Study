@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CCST">
+<meta name="theme-color" content="#0a0e1a">
+<title>CCST Study Plan</title>
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --surface2: #1a2440;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --text: #f0f4ff;
+  --muted: #7a8aaa;
+  --accent: #4a9eff;
+  --green: #2ecc71;
+  --amber: #f5a623;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { background: var(--bg); color: var(--text); font-family: -apple-system, 'SF Pro Display', sans-serif; overflow-x: hidden; }
+
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,14,26,0.95);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  padding: calc(var(--safe-top) + 14px) 20px 14px;
+  border-bottom: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-title { font-size: 17px; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+.nav-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.nav-badge { background: var(--surface2); border: 0.5px solid var(--border2); border-radius: 20px; padding: 5px 12px; font-size: 13px; font-weight: 600; color: var(--green); }
+
+.hero { padding: 20px 20px 0; }
+.countdown-card {
+  background: var(--surface2); border: 0.5px solid var(--border2); border-radius: 18px;
+  padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+}
+.cd-days { font-size: 36px; font-weight: 700; color: var(--amber); line-height: 1; }
+.cd-label { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.cd-right { text-align: right; }
+.cd-right .exam-label { font-size: 11px; color: var(--muted); }
+.cd-right .exam-date { font-size: 16px; font-weight: 600; color: var(--text); margin-top: 3px; }
+
+.prog-wrap { margin-bottom: 16px; }
+.prog-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.prog-row span { font-size: 12px; color: var(--muted); }
+.prog-row strong { font-size: 12px; color: var(--text); }
+.track { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+.fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--green)); transition: width .4s; }
+.dots-row { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.dots-row::-webkit-scrollbar { display: none; }
+.dot-btn {
+  min-width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border2);
+  background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: all .15s;
+}
+.dot-btn.done { background: var(--green); border-color: var(--green); color: #0a0e1a; }
+.dot-btn.today { border-color: var(--accent); color: var(--accent); }
+
+.install-tip {
+  background: rgba(74,158,255,0.08); border: 0.5px solid rgba(74,158,255,0.2);
+  border-radius: 14px; padding: 12px 14px; margin-bottom: 16px;
+  font-size: 12px; color: rgba(240,244,255,0.65); line-height: 1.7;
+}
+.install-tip strong { color: var(--accent); }
+.install-tip .close-tip { float: right; background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; line-height: 1; margin: -2px -2px 0 8px; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.weeks { padding: 0 20px; }
+.week-title {
+  font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .1em;
+  margin: 24px 0 10px; display: flex; align-items: center; gap: 8px;
+}
+.week-title::after { content:''; flex:1; height:0.5px; background:var(--border); }
+
+.card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 18px; margin-bottom: 10px; overflow: hidden; }
+.card.open { border-color: var(--border2); }
+.card-head {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer;
+}
+.card-head:active { background: rgba(255,255,255,0.03); }
+.color-pip { width: 3px; height: 38px; border-radius: 2px; flex-shrink: 0; }
+.card-info { flex: 1; min-width: 0; }
+.card-day { font-size: 10px; color: var(--muted); font-weight: 500; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.chip { font-size: 10px; color: var(--muted); background: var(--surface2); padding: 3px 8px; border-radius: 10px; white-space: nowrap; }
+.check-btn {
+  width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border2);
+  background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.check-btn.done { background: var(--green); border-color: var(--green); }
+.check-btn svg { width: 13px; height: 13px; stroke: rgba(255,255,255,0.4); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: stroke .15s; }
+.check-btn.done svg { stroke: #0a0e1a; }
+.arr { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; transition: transform .2s; }
+.arr.open { transform: rotate(90deg); }
+.arr svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; }
+
+.card-body { display: none; padding: 0 16px 16px; }
+.card-body.open { display: block; }
+
+.sess-label {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; letter-spacing: .02em;
+}
+.tasks { display: flex; flex-direction: column; gap: 7px; }
+.task { display: flex; gap: 10px; font-size: 13px; color: rgba(240,244,255,0.7); line-height: 1.55; align-items: flex-start; }
+.tbullet { width: 5px; height: 5px; border-radius: 50%; background: var(--border2); flex-shrink: 0; margin-top: 8px; }
+.vids { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.vid-link {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface2); border: 0.5px solid var(--border); border-radius: 12px;
+  padding: 10px 12px; text-decoration: none; -webkit-user-select: none;
+}
+.vid-link:active { background: rgba(74,158,255,0.1); border-color: var(--border2); }
+.yt-ico { width: 32px; height: 23px; background: #ff0000; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.yt-ico::after { content:''; border-left: 10px solid #fff; border-top: 6px solid transparent; border-bottom: 6px solid transparent; margin-left: 3px; }
+.vid-meta { flex: 1; min-width: 0; }
+.vid-title { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vid-ch { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.vid-arr { font-size: 18px; color: var(--muted); flex-shrink: 0; }
+
+.sep { border: none; border-top: 0.5px solid var(--border); margin: 12px 0; }
+.tip { border-radius: 12px; padding: 10px 13px; font-size: 12px; line-height: 1.65; margin-top: 8px; }
+.tip-head { font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; margin-bottom: 4px; }
+.tip.focus { background: rgba(167,139,250,0.1); border: 0.5px solid rgba(167,139,250,0.2); color: #c4b5fd; }
+.tip.focus .tip-head { color: #a78bfa; }
+.tip.exam { background: rgba(46,204,113,0.08); border: 0.5px solid rgba(46,204,113,0.18); color: #6ee7b7; }
+.tip.exam .tip-head { color: #2ecc71; }
+
+.bottom-pad { height: calc(var(--safe-bot) + 30px); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div>
+    <div class="nav-title">CCST · Study Plan</div>
+    <div class="nav-sub">ADHD edition · 18 days · May 4th</div>
+  </div>
+  <div class="nav-badge" id="nav-badge">0/18</div>
+</nav>
+
+<div class="hero">
+  <div class="countdown-card">
+    <div>
+      <div class="cd-days" id="days-left">—</div>
+      <div class="cd-label">days until exam</div>
+    </div>
+    <div class="cd-right">
+      <div class="exam-label">Exam date</div>
+      <div class="exam-date">May 4, 2025</div>
+    </div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-row"><span>Progress</span><strong id="prog-txt">0 of 18 complete</strong></div>
+    <div class="track"><div class="fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="dots-row" id="dots-row"></div>
+  </div>
+
+  <div class="install-tip" id="install-tip" style="display:none">
+    <button class="close-tip" onclick="document.getElementById('install-tip').style.display='none'">×</button>
+    <strong>Add to Home Screen</strong> for the full app!<br>
+    Tap <strong>Share</strong> in Safari → <strong>"Add to Home Screen"</strong>
+  </div>
+
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:#4a9eff"></div>Standards</div>
+    <div class="leg"><div class="leg-dot" style="background:#2ecc71"></div>IP / Subnetting</div>
+    <div class="leg"><div class="leg-dot" style="background:#f5a623"></div>Cables / Wi-Fi</div>
+    <div class="leg"><div class="leg-dot" style="background:#ff6b5b"></div>Infrastructure</div>
+    <div class="leg"><div class="leg-dot" style="background:#a78bfa"></div>Troubleshooting</div>
+    <div class="leg"><div class="leg-dot" style="background:#34d399"></div>Security</div>
+  </div>
+</div>
+
+<div class="weeks" id="weeks"></div>
+<div class="bottom-pad"></div>
+
+<script>
+var C={blue:'#4a9eff',teal:'#2ecc71',amber:'#f5a623',coral:'#ff6b5b',purple:'#a78bfa',green:'#34d399',gray:'#6b7280'};
+
+var PLAN=[
+{day:1,color:C.blue,title:'OSI model — the whole map',time:'~45 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(74,158,255,0.12)',tc:'#93c5fd',
+   videos:[{t:'OSI model in 6 min',ch:'NetworkChuck',url:'https://www.youtube.com/watch?v=vv4y_uOneC0'},
+           {t:'TCP/IP vs OSI visual breakdown',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=7IS7gigunyI'}]},
+  {label:'Do · 25 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Draw the 7 OSI layers on paper from memory','Label which protocol belongs to each layer','Say it out loud once — saying it sticks better']}
+ ],
+ focus:'NetworkChuck uses coffee, fast cuts, and real examples — zero boring slides. Perfect for keeping focus locked in.',
+ exam:'OSI Layer 7 = Application (where you live). Layer 1 = Physical (cables). Memorize top-down.'},
+
+{day:2,color:C.blue,title:'Ethernet, MAC addresses & switches',time:'~45 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(74,158,255,0.12)',tc:'#93c5fd',
+   videos:[{t:'How switches work (animated)',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=FGst4gSmFpg'},
+           {t:'MAC address explained fast',ch:'NetworkChuck',url:'https://www.youtube.com/watch?v=AhOU2eOjADw'}]},
+  {label:'Do · 25 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Write: hub vs switch vs router — one sentence each','Run ipconfig /all on your work PC, find your MAC address','Quiz yourself: can a switch talk between VLANs alone?']}
+ ],
+ focus:'PowerCert Animated = pure diagrams, no talking head. Rewind the switch segment twice if needed.',
+ exam:'Hub = shares bandwidth. Switch = dedicated per port. Router = connects different networks.'},
+
+{day:3,color:C.teal,title:'IPv4 addressing — the basics',time:'~50 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(46,204,113,0.1)',tc:'#6ee7b7',
+   videos:[{t:'IP addresses explained visually',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=ddM9AcreVqY'},
+           {t:'Subnetting intro — no math panic',ch:'NetworkChuck',url:'https://www.youtube.com/watch?v=BWZ-MHIhqjM'}]},
+  {label:'Do · 30 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Memorize private ranges: 10.x, 172.16-31.x, 192.168.x','Write out /24, /25, /26 and their subnet masks','subnettingpractice.com — do 5 problems, no timer yet']}
+ ],
+ focus:'Break into two 25-min blocks with a 5-min walk between. IP addressing is dense — do NOT power through.',
+ exam:'192.168.1.0/24 = 256 addresses, 254 usable. Most common exam format.'},
+
+{day:4,color:C.teal,title:'Subnetting — drill day',time:'~50 min',
+ sessions:[
+  {label:'Watch · 15 min',bg:'rgba(46,204,113,0.1)',tc:'#6ee7b7',
+   videos:[{t:'Subnetting the easy way (magic number)',ch:'Sunny Classroom',url:'https://www.youtube.com/watch?v=OqsXzkXfwRw'},
+           {t:'Subnetting in 7 mins flat',ch:'Practical Networking',url:'https://www.youtube.com/watch?v=ZxAwQB8TZsM'}]},
+  {label:'Do · 35 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['10 timed problems at subnettingpractice.com','Write the /24 through /30 cheat sheet from memory','Target: under 90 sec per problem']}
+ ],
+ focus:'Sunny Classroom = slow & clear for slow days. Practical Networking = faster for high-energy days.',
+ exam:'Magic number = 256 minus subnet mask. /26 = mask 192, magic = 64 = your block size.'},
+
+{day:5,color:C.amber,title:'Cables, media & connectors',time:'~40 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(245,166,35,0.1)',tc:'#fcd34d',
+   videos:[{t:'Network cables explained (all types)',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=_NX99ad2FUA'},
+           {t:'Fiber optic cable visually explained',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=Bx6EmFTJHSc'}]},
+  {label:'Do · 20 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Table: cable type | max speed | max distance','Cat5e = 1Gbps/100m. Cat6 = 10Gbps/55m. Memorize these.','Single-mode fiber = long distance. Multimode = short.']}
+ ],
+ focus:'PowerCert videos are under 10 min with clean visuals. Watch at 1.25x speed to stay engaged.',
+ exam:'100 meters = copper UTP limit. Anything longer needs fiber. Exam will test this.'},
+
+{day:6,color:C.amber,title:'Wi-Fi & wireless standards',time:'~40 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(245,166,35,0.1)',tc:'#fcd34d',
+   videos:[{t:'Wi-Fi 802.11 standards explained',ch:'Professor Messer',url:'https://www.youtube.com/watch?v=AxvkWt2eXTc'},
+           {t:'WPA vs WPA2 vs WPA3 clearly',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=n_Qo0bIr2nA'}]},
+  {label:'Do · 20 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['802.11ac = Wi-Fi 5 = 5GHz. 802.11n = Wi-Fi 4 = both bands.','WEP = broken. WPA = TKIP. WPA2 = AES. WPA3 = newest.','Check your home router — what standard is it using?']}
+ ],
+ focus:'Professor Messer is calm and structured — great for when your brain needs a slower gear.',
+ exam:'WPA2 + AES = almost always the right answer on the exam for secure wireless.'},
+
+{day:7,color:C.blue,title:'Ports & protocols — the must-knows',time:'~40 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(74,158,255,0.12)',tc:'#93c5fd',
+   videos:[{t:'DNS explained in 5 min',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=Wj0od2ag5sk'},
+           {t:'DHCP DORA process visually',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=e6-TaH5bkjo'}]},
+  {label:'Do · 20 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Memorize: 22 SSH · 23 Telnet · 25 SMTP · 53 DNS · 67/68 DHCP · 80 HTTP · 443 HTTPS · 3389 RDP','DHCP DORA = Discover, Offer, Request, Acknowledge','Cover the port column — name each service from memory']}
+ ],
+ focus:'Make a phone wallpaper with the port numbers — visual placement beats re-reading.',
+ exam:'Port numbers are guaranteed on the exam. 10 ports = 10 easy points.'},
+
+{day:8,color:C.coral,title:'Routers, routing & VLANs',time:'~50 min',
+ sessions:[
+  {label:'Watch · 25 min',bg:'rgba(255,107,91,0.1)',tc:'#fca5a5',
+   videos:[{t:'VLANs explained with animation',ch:'NetworkChuck',url:'https://www.youtube.com/watch?v=jC6MJTh9ja0'},
+           {t:'How routers work — visually',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=AkxqkoxErRk'}]},
+  {label:'Do · 25 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Draw: 2 VLANs, 1 router, 1 switch','VLANs = broadcast domain. Needs router to talk across VLANs.','Sketch a routing table: destination | next hop | interface']}
+ ],
+ focus:"NetworkChuck's VLAN video is fast, funny, and clicks visually. Watch it twice — no shame.",
+ exam:'Router-on-a-stick = one router with sub-interfaces per VLAN. Scenario exam favorite.'},
+
+{day:9,color:C.coral,title:'NAT, WAN types & topologies',time:'~40 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(255,107,91,0.1)',tc:'#fca5a5',
+   videos:[{t:'NAT explained simply',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=FTUV0t6JaDA'},
+           {t:'Network topologies (star, mesh, bus)',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=zbqrNg4C98U'}]},
+  {label:'Do · 20 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['NAT = private IP → public IP. Happens at the router.','Draw each topology: star, bus, ring, mesh — label pros/cons','IaaS = servers, PaaS = platform, SaaS = software (like Gmail)']}
+ ],
+ focus:'Two short PowerCert videos + 5-min break in the middle. Perfect focus window.',
+ exam:'Star topology = most common. Mesh = most redundant. Both heavily tested.'},
+
+{day:10,color:C.purple,title:'Troubleshooting tools & methodology',time:'~45 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(167,139,250,0.12)',tc:'#c4b5fd',
+   videos:[{t:'ping & traceroute explained',ch:'NetworkChuck',url:'https://www.youtube.com/watch?v=vYqjkvNmAhQ'},
+           {t:'ipconfig, nslookup, netstat explained',ch:'Professor Messer',url:'https://www.youtube.com/watch?v=O8oMYjEXwXw'}]},
+  {label:'Do · 25 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Open CMD: run ping 8.8.8.8, then tracert 8.8.8.8','Run ipconfig /all — find your IP, subnet, gateway, DNS','Order: loopback → gateway → DNS → destination']}
+ ],
+ focus:'Hands-on CMD keeps your brain locked in. Something to DO beats reading every time.',
+ exam:'Always start with ping 127.0.0.1 (loopback) to confirm NIC works.'},
+
+{day:11,color:C.purple,title:'Cisco show commands — CLI lab',time:'~50 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(167,139,250,0.12)',tc:'#c4b5fd',
+   videos:[{t:'Cisco CLI show commands (beginner)',ch:'NetworkChuck',url:'https://www.youtube.com/watch?v=H8W9oMNSuwo'},
+           {t:'Reading routing tables explained',ch:'David Bombal',url:'https://www.youtube.com/watch?v=Zl7lJmFXl-A'}]},
+  {label:'Lab · 30 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Download Cisco Packet Tracer FREE at netacad.com','Build: 1 router, 1 switch, 2 PCs → run show ip interface brief','Practice: show run | show version | show mac-address-table']}
+ ],
+ focus:"David Bombal's labs are short enough to finish without losing focus. Hyperfocus will kick in.",
+ exam:'"show ip interface brief" = most tested CLI command. Know up/up vs up/down vs admin down.'},
+
+{day:12,color:C.green,title:'Firewalls, ACLs & DMZ',time:'~40 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(52,211,153,0.1)',tc:'#6ee7b7',
+   videos:[{t:'Firewalls explained visually',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=kDEX1HXybrU'},
+           {t:'Cisco ACLs — how they work',ch:'David Bombal',url:'https://www.youtube.com/watch?v=8OtHHLlNECU'}]},
+  {label:'Do · 20 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Cisco firewalls DENY ALL inbound by default','DMZ = middle zone for public servers (web, email)','Stateful = remembers connections. Stateless = checks each packet.']}
+ ],
+ focus:'Watch the PowerCert firewall video, then immediately write the 3 key rules on a sticky note.',
+ exam:'"What does a Cisco firewall do by default?" → Deny all inbound. Guaranteed exam answer.'},
+
+{day:13,color:C.green,title:'AAA, VPNs & wireless security',time:'~40 min',
+ sessions:[
+  {label:'Watch · 20 min',bg:'rgba(52,211,153,0.1)',tc:'#6ee7b7',
+   videos:[{t:'AAA security — auth, authz, accounting',ch:'Professor Messer',url:'https://www.youtube.com/watch?v=XiCQa0rdXtM'},
+           {t:'VPN types explained clearly',ch:'PowerCert Animated',url:'https://www.youtube.com/watch?v=R-JUOpCgTZc'}]},
+  {label:'Do · 20 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['AAA: Authentication = WHO · Authorization = WHAT · Accounting = WHAT DID YOU DO','RADIUS = UDP, network access. TACACS+ = TCP, device admin.','VPN: site-to-site = offices. Remote access = work from home.']}
+ ],
+ focus:'Can you explain AAA in 30 seconds? Teaching out loud = best ADHD memory trick.',
+ exam:'TACACS+ = TCP, encrypts whole packet. RADIUS = UDP. Classic exam trap.'},
+
+{day:14,color:C.gray,title:'Weak spot review day',time:'~60 min',
+ sessions:[
+  {label:'Diagnose · 15 min',bg:'rgba(107,114,128,0.12)',tc:'#d1d5db',
+   items:['Take 30 free questions at quizlet.com/882022877','Write every topic you got wrong — be honest','Rank your 2-3 shakiest topics']},
+  {label:'Fix it · 45 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   videos:[{t:'CCST full topic review',ch:'Keith Barker (CBT Nuggets)',url:'https://www.youtube.com/results?search_query=CCST+networking+100-150+review+Keith+Barker'},
+           {t:'Free CCST flashcards',ch:'Quizlet',url:'https://quizlet.com/882022877/cisco-ccst-networking-exam-level-questions-flash-cards/'}]}
+ ],
+ focus:'Pomodoro method: 25 min study, 5 min break. Physical timer only — not your phone.',
+ exam:'If subnetting is still shaky — spend the full 60 min on it. Worth 10-15% of the exam.'},
+
+{day:15,color:C.purple,title:'Scenario practice & Packet Tracer',time:'~55 min',
+ sessions:[
+  {label:'Watch · 15 min',bg:'rgba(167,139,250,0.12)',tc:'#c4b5fd',
+   videos:[{t:'Packet Tracer lab — build a real network',ch:'David Bombal',url:'https://www.youtube.com/watch?v=QhMOeNZWkWk'},
+           {t:'Troubleshooting scenario lab',ch:'NetworkChuck',url:'https://www.youtube.com/results?search_query=networkchuck+troubleshooting+lab'}]},
+  {label:'Lab · 40 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Build a 2-VLAN network in Packet Tracer','Break it on purpose — unplug a cable, change an IP — then fix it','Say out loud what you are checking and why']}
+ ],
+ focus:'Breaking things in Packet Tracer = peak ADHD-compatible studying. Hyperfocus will lock in.',
+ exam:'Scenario questions = 30%+ of exam. Practice: "I would check ___ because ___.'},
+
+{day:16,color:C.gray,title:'Full mock exam #1 — timed',time:'~90 min',
+ sessions:[
+  {label:'Exam sim · 50 min',bg:'rgba(107,114,128,0.12)',tc:'#d1d5db',
+   items:['Go to nwexam.com or cisconetsolutions.com','Set 50-min timer. No looking things up. Real conditions.','Target: 70%+ to feel confident']},
+  {label:'Review · 40 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Go through every wrong answer — understand WHY','Group wrong answers by topic','Watch a short video on your #1 weak topic today']}
+ ],
+ focus:'Focus dropping mid-exam? 2-min break + 10 jumping jacks. Movement resets ADHD fast.',
+ exam:'Scoring 70%+ on practice = on track to pass. Real exam is similar difficulty.'},
+
+{day:17,color:C.gray,title:'Full mock exam #2 + final review',time:'~80 min',
+ sessions:[
+  {label:'Exam sim · 50 min',bg:'rgba(107,114,128,0.12)',tc:'#d1d5db',
+   items:['Use a different practice source — avoid memorizing answers','Hard 50-min limit — build exam stamina','Flag questions you felt unsure about, even if correct']},
+  {label:'Final review · 30 min',bg:'rgba(167,139,250,0.1)',tc:'#c4b5fd',
+   items:['Review port number list one last time','OSI model — say all 7 layers out loud','Read your sticky notes and hand-written cheat sheets']}
+ ],
+ focus:'Do NOT study new material tonight. Consolidate. Keep energy positive.',
+ exam:'Confidence matters. 17 days of work is behind you. Trust the process.'},
+
+{day:18,color:C.gray,title:'Exam day — May 4th',time:'50 min exam',
+ sessions:[
+  {label:'Morning · 30 min max',bg:'rgba(107,114,128,0.12)',tc:'#d1d5db',
+   items:['Light review only: ports, OSI layers, WPA2=AES','Eat a good breakfast — your brain runs on glucose','Arrive early, bring valid photo ID']},
+  {label:'During the exam',bg:'rgba(52,211,153,0.1)',tc:'#6ee7b7',
+   items:['Read each question TWICE before answering','Eliminate 2 wrong answers first, then choose','Flag uncertain questions and come back','About 1 min per question — trust your gut']}
+ ],
+ focus:'Focus slipping? Tap your foot, 3 slow breaths, re-read the question. You have time.',
+ exam:'Trust your IT support experience. Many questions will feel familiar. You got this.'}
+];
+
+var WEEKS=[
+  {label:'Week 1 — foundations',days:[1,2,3,4,5,6,7]},
+  {label:'Week 2 — infrastructure & security',days:[8,9,10,11,12,13,14]},
+  {label:'Week 3 — practice & exam',days:[15,16,17,18]}
+];
+
+// Progress stored in localStorage
+var done=new Set();
+try { done=new Set(JSON.parse(localStorage.getItem('ccst-done')||'[]')); } catch(e){}
+
+function save(){try{localStorage.setItem('ccst-done',JSON.stringify([...done]));}catch(e){}}
+
+function updateUI(){
+  var n=done.size, pct=Math.round(n/18*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-txt').textContent=n+' of 18 complete';
+  document.getElementById('nav-badge').textContent=n+'/18';
+  for(var i=1;i<=18;i++){
+    var d=document.getElementById('dot-'+i);
+    if(d) d.className='dot-btn'+(done.has(i)?' done':'');
+    var c=document.getElementById('chk-'+i);
+    if(c) c.className='check-btn'+(done.has(i)?' done':'');
+  }
+}
+
+function toggleDone(day,e){
+  e.stopPropagation();
+  if(done.has(day)) done.delete(day); else done.add(day);
+  save(); updateUI();
+}
+
+function toggleCard(day){
+  var body=document.getElementById('b-'+day);
+  var card=document.getElementById('c-'+day);
+  var arr=document.getElementById('a-'+day);
+  var open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  card.classList.toggle('open',!open);
+  arr.classList.toggle('open',!open);
+}
+
+// Countdown
+function countdown(){
+  var exam=new Date('2025-05-04T09:00:00');
+  var diff=Math.ceil((exam-new Date())/86400000);
+  document.getElementById('days-left').textContent=diff>0?diff:diff===0?'Today!':'Done!';
+}
+countdown();
+
+// Build dots
+var dr=document.getElementById('dots-row');
+for(var i=1;i<=18;i++){
+  (function(day){
+    var d=document.createElement('button');
+    d.className='dot-btn'+(done.has(day)?' done':'');
+    d.id='dot-'+day;
+    d.textContent=day;
+    d.onclick=function(e){toggleDone(day,e);};
+    dr.appendChild(d);
+  })(i);
+}
+
+// Build weeks
+var weeksEl=document.getElementById('weeks');
+WEEKS.forEach(function(w){
+  var sec=document.createElement('div');
+  var wt=document.createElement('div');
+  wt.className='week-title';
+  wt.textContent=w.label;
+  sec.appendChild(wt);
+
+  w.days.forEach(function(dayNum){
+    var d=PLAN[dayNum-1];
+
+    // Build sessions HTML
+    var sessHTML='';
+    d.sessions.forEach(function(s,si){
+      if(si>0) sessHTML+='<hr class="sep">';
+      sessHTML+='<div class="sess-label" style="background:'+s.bg+';color:'+s.tc+'">'+s.label+'</div>';
+      if(s.items){
+        sessHTML+='<div class="tasks">';
+        s.items.forEach(function(item){
+          sessHTML+='<div class="task"><div class="tbullet"></div><span>'+item+'</span></div>';
+        });
+        sessHTML+='</div>';
+      }
+      if(s.videos){
+        sessHTML+='<div class="vids">';
+        s.videos.forEach(function(v){
+          sessHTML+='<a class="vid-link" href="'+v.url+'" target="_blank">'+
+            '<div class="yt-ico"></div>'+
+            '<div class="vid-meta"><div class="vid-title">'+v.t+'</div><div class="vid-ch">'+v.ch+'</div></div>'+
+            '<div class="vid-arr">›</div></a>';
+        });
+        sessHTML+='</div>';
+      }
+    });
+
+    if(d.focus) sessHTML+='<div class="tip focus"><div class="tip-head">Focus tip</div>'+d.focus+'</div>';
+    if(d.exam) sessHTML+='<div class="tip exam"><div class="tip-head">Exam tip</div>'+d.exam+'</div>';
+
+    var card=document.createElement('div');
+    card.className='card'+(done.has(d.day)?' ':'');
+    card.id='c-'+d.day;
+    card.innerHTML=
+      '<div class="card-head" onclick="toggleCard('+d.day+')">'+
+        '<div class="color-pip" style="background:'+d.color+'"></div>'+
+        '<div class="card-info">'+
+          '<div class="card-day">Day '+d.day+'</div>'+
+          '<div class="card-title">'+d.title+'</div>'+
+        '</div>'+
+        '<div class="chip">'+d.time+'</div>'+
+        '<button class="check-btn'+(done.has(d.day)?' done':'')+'" id="chk-'+d.day+'" onclick="toggleDone('+d.day+',event)" aria-label="Mark complete">'+
+          '<svg viewBox="0 0 13 13"><polyline points="2,7 5,10 11,3"/></svg>'+
+        '</button>'+
+        '<div class="arr" id="a-'+d.day+'">'+
+          '<svg viewBox="0 0 16 16"><polyline points="6,4 10,8 6,12"/></svg>'+
+        '</div>'+
+      '</div>'+
+      '<div class="card-body" id="b-'+d.day+'">'+sessHTML+'</div>';
+    sec.appendChild(card);
+  });
+  weeksEl.appendChild(sec);
+});
+
+updateUI();
+
+// Show install tip on iOS Safari only
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.navigator.standalone){
+  document.getElementById('install-tip').style.display='block';
+}
+</script>
+</body>
+</html>
