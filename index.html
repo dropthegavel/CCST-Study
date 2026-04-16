@@ -160,7 +160,7 @@ html, body { background: var(--bg); color: var(--text); font-family: -apple-syst
     </div>
     <div class="cd-right">
       <div class="exam-label">Exam date</div>
-      <div class="exam-date">May 4, 2025</div>
+      <div class="exam-date">May 4, 2026</div>
     </div>
   </div>
 
@@ -432,7 +432,7 @@ function toggleCard(day){
 
 // Countdown
 function countdown(){
-  var exam=new Date('2025-05-04T09:00:00');
+  var exam=new Date('2026-05-04T09:00:00');
   var diff=Math.ceil((exam-new Date())/86400000);
   document.getElementById('days-left').textContent=diff>0?diff:diff===0?'Today!':'Done!';
 }
